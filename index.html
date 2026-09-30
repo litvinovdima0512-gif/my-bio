@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Murzik & Dima | Premium Bio</title>
+    <title>Murzik & Dima | Bio</title>
     <style>
         :root {
             --bg-dark: #07080e;
@@ -54,13 +54,16 @@
             top: 0; left: 15%; right: 15%; height: 3px;
             background: linear-gradient(90deg, transparent, var(--glow-purple), var(--glow-cyan), transparent);
         }
-        .music-player {
+
+        /* --- КНОПКА ОТКРЫТИЯ ПЛЕЕРА --- */
+        .music-toggle-btn {
             position: absolute;
             top: 20px;
             right: 20px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             cursor: pointer;
             display: flex;
@@ -70,14 +73,120 @@
             transition: all 0.3s ease;
             z-index: 10;
         }
-        .music-player.playing {
-            animation: rotate 4s linear infinite;
+        .music-toggle-btn:hover {
             border-color: var(--glow-cyan);
-            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.3);
+            transform: scale(1.05);
         }
-        @keyframes rotate {
+
+        /* --- СТИЛЬНЫЙ БАР ПЕСНИ (ПЛЕЕР) --- */
+        .music-bar {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(10, 12, 20, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            margin-bottom: 20px;
+            padding: 0 14px;
+        }
+        .music-bar.open {
+            max-height: 120px;
+            opacity: 1;
+            padding: 12px 14px;
+            border-color: rgba(188, 111, 241, 0.3);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+        }
+        .player-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-align: left;
+        }
+        .track-cover {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--glow-purple), var(--glow-cyan));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+            animation: spin 8s linear infinite;
+            animation-play-state: paused;
+        }
+        .music-bar.playing .track-cover {
+            animation-play-state: running;
+            box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+        }
+        @keyframes spin {
             100% { transform: rotate(360deg); }
         }
+        .track-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .track-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .track-artist {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+        .play-btn {
+            background: linear-gradient(135deg, var(--glow-purple), var(--glow-cyan));
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: #fff;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+        .play-btn:active { transform: scale(0.9); }
+        
+        /* Прогресс бар */
+        .progress-container {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .progress-bar {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--glow-purple), var(--glow-cyan));
+            border-radius: 4px;
+            transition: width 0.1s linear;
+        }
+        .time-text {
+            font-size: 10px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            min-width: 28px;
+        }
+
         .avatar-wrapper {
             position: relative;
             width: 110px;
@@ -198,12 +307,12 @@
             border-color: rgba(0, 240, 255, 0.3);
         }
         .row-arrow {
-            color: var(--glow-cyan);
-            font-size: 15px;
-            font-weight: 700;
+            color: #3b82f6;
+            font-size: 13px;
+            font-weight: 600;
         }
         .panel-iris {
-            margin-top: 22px;
+            margin-top: 12px;
             padding: 15px;
             background: rgba(0, 0, 0, 0.3);
             border-radius: 18px;
@@ -225,7 +334,7 @@
         }
         .iris-link {
             font-size: 11px;
-            color: var(--glow-purple);
+            color: #3b82f6;
             text-decoration: none;
             font-weight: 700;
             text-transform: uppercase;
@@ -240,18 +349,40 @@
             border-radius: 8px;
             border: 1px solid rgba(188, 111, 241, 0.08);
             font-weight: 700;
+            word-break: break-all;
         }
     </style>
 </head>
 <body>
 
-    <audio id="bg-audio" loop src="https://soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+    <!-- Замените grustinka.mp3 на имя своего файла или прямую ссылку -->
+    <audio id="bg-audio" loop src="grustinka.mp3"></audio>
 
     <div class="card">
-        <div class="music-player" id="music-btn" onclick="toggleMusic()">🔇</div>
+        <!-- Кнопка вызова/скрытия бара -->
+        <button class="music-toggle-btn" id="toggle-btn" onclick="togglePlayerPanel()" title="Плеер">🎵</button>
 
         <div class="avatar-wrapper">
             <img class="avatar-img" src="avatar.png" onerror="this.src='https://picsum.photos/200'" alt="Avatar">
+        </div>
+
+        <!-- Выезжающая панель плеера -->
+        <div class="music-bar" id="music-bar">
+            <div class="player-row">
+                <div class="track-cover">💿</div>
+                <div class="track-info">
+                    <div class="track-title">Грустинка</div>
+                    <div class="track-artist">onokami</div>
+                </div>
+                <button class="play-btn" id="main-play-btn" onclick="togglePlay()">▶</button>
+            </div>
+            <div class="progress-container">
+                <span class="time-text" id="time-curr">0:00</span>
+                <div class="progress-bar" id="progress-bar" onclick="seek(event)">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <span class="time-text" id="time-dur">0:00</span>
+            </div>
         </div>
         
         <h1>Murzik : Dima</h1>
@@ -264,11 +395,11 @@
         <div class="stats-container">
             <div class="stats-box">
                 <div class="stats-label">Возраст</div>
-                <div class="stats-value" style="color: var(--glow-purple);">Секрет</div>
+                <div class="stats-value">1[-]</div>
             </div>
             <div class="stats-box">
                 <div class="stats-label">Рост</div>
-                <div class="stats-value">178 см</div>
+                <div class="stats-value">175 см</div>
             </div>
             <div class="stats-box">
                 <div class="stats-label">Бд</div>
@@ -277,54 +408,94 @@
         </div>
 
         <a href="https://donationalerts.com" onclick="startMusic()" target="_blank" class="btn-action btn-da">
-            <span>💎 Поддержать на DonationAlerts</span>
+            <span>💸 DonationAlerts</span>
         </a>
         
         <a href="https://t.me" onclick="startMusic()" target="_blank" class="btn-action btn-boost">
-            <span>🚀 Бустануть наш канал</span>
+            <span>⚡ Boost Channel</span>
         </a>
         
-        <a href="https://t.me" onclick="startMusic()" target="_blank" class="row-link">
-            <span>👑 Лс: @Murrzilkaa</span>
-            <span class="row-arrow">→</span>
+        <a href="https://t.me/Murrzilkaa" onclick="startMusic()" target="_blank" class="row-link">
+            <span>Лс: @Murrzilkaa</span>
+            <span class="row-arrow">Написать ↗</span>
         </a>
 
-        <a href="https://teletype.in" onclick="startMusic()" target="_blank" class="row-link">
-            <span>📖 Подробнее / Teletype</span>
-            <span class="row-arrow">→</span>
+        <a href="https://t.me" onclick="startMusic()" target="_blank" class="row-link">
+            <span>💬 Анонимные сообщения</span>
+            <span class="row-arrow">Открыть ↗</span>
         </a>
 
         <div class="panel-iris">
             <div class="iris-top">
                 <span class="iris-title">В ЛС ИРИСА</span>
-                <a href="https://t.me" target="_blank" class="iris-link">ОТПРАВИТЬ</a>
+                <a href="https://t.me" target="_blank" class="iris-link">Отправить команду ↗</a>
             </div>
-            <code>+био</code>
+            <code>+саб @7127295961</code>
         </div>
     </div>
 
     <script>
         const audio = document.getElementById('bg-audio');
-        const btn = document.getElementById('music-btn');
+        const musicBar = document.getElementById('music-bar');
+        const mainPlayBtn = document.getElementById('main-play-btn');
+        const progressFill = document.getElementById('progress-fill');
+        const timeCurr = document.getElementById('time-curr');
+        const timeDur = document.getElementById('time-dur');
 
-        function toggleMusic() {
+        // Открытие / закрытие панели плеера
+        function togglePlayerPanel() {
+            musicBar.classList.toggle('open');
+        }
+
+        // Включение / Пауза
+        function togglePlay() {
             if (audio.paused) {
                 audio.play();
-                btn.innerText = "🎵";
-                btn.classList.add('playing');
             } else {
                 audio.pause();
-                btn.innerText = "🔇";
-                btn.classList.remove('playing');
             }
         }
 
         function startMusic() {
             if (audio.paused) {
                 audio.play();
-                btn.innerText = "🎵";
-                btn.classList.add('playing');
             }
+        }
+
+        // Обновление иконки и анимации
+        audio.addEventListener('play', () => {
+            mainPlayBtn.innerText = "⏸";
+            musicBar.classList.add('playing');
+        });
+
+        audio.addEventListener('pause', () => {
+            mainPlayBtn.innerText = "▶";
+            musicBar.classList.remove('playing');
+        });
+
+        // Обновление прогресс-бара и таймера
+        audio.addEventListener('timeupdate', () => {
+            if (audio.duration) {
+                const pct = (audio.currentTime / audio.duration) * 100;
+                progressFill.style.width = pct + '%';
+                timeCurr.innerText = formatTime(audio.currentTime);
+                timeDur.innerText = formatTime(audio.duration);
+            }
+        });
+
+        // Перемотка трека по клику на полосу
+        function seek(e) {
+            const bar = document.getElementById('progress-bar');
+            const rect = bar.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const pct = clickX / rect.width;
+            audio.currentTime = pct * audio.duration;
+        }
+
+        function formatTime(sec) {
+            const m = Math.floor(sec / 60);
+            const s = Math.floor(sec % 60);
+            return `${m}:${s < 10 ? '0' : ''}${s}`;
         }
     </script>
 </body>
