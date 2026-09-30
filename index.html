@@ -45,7 +45,7 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
             text-align: center;
             position: relative;
-            transform: translateZ(0); /* Аппаратное ускорение */
+            transform: translateZ(0);
         }
         .card::before {
             content: '';
@@ -54,7 +54,6 @@
             background: linear-gradient(90deg, transparent, var(--glow-purple), var(--glow-cyan), transparent);
         }
 
-        /* Кнопка открытия/закрытия плеера */
         .music-toggle-btn {
             position: absolute;
             top: 18px;
@@ -76,7 +75,6 @@
             transform: scale(0.92);
         }
 
-        /* Оптимизированный выезжающий плеер */
         .music-bar {
             max-height: 0;
             opacity: 0;
@@ -177,7 +175,6 @@
             min-width: 26px;
         }
 
-        /* Аватарка */
         .avatar-wrapper {
             width: 96px;
             height: 96px;
@@ -246,7 +243,6 @@
             font-weight: 800;
         }
 
-        /* Кнопки */
         .btn-action {
             display: flex;
             align-items: center;
@@ -268,7 +264,6 @@
             background: linear-gradient(135deg, #00c853, #00b0ff);
         }
 
-        /* Ссылки списком */
         .row-link {
             display: flex;
             align-items: center;
@@ -293,7 +288,6 @@
             font-weight: 600;
         }
 
-        /* Блок Ириса */
         .panel-iris {
             margin-top: 10px;
             padding: 12px;
@@ -337,19 +331,17 @@
 </head>
 <body>
 
-    <!-- Ссылка на локальный файл grustinka.mp3 -->
-    <audio id="bg-audio" loop src="grustinka.mp3" preload="metadata"></audio>
+    <!-- Относительный путь для GitHub Pages -->
+    <audio id="bg-audio" loop src="./grustinka.mp3" preload="auto"></audio>
 
     <div class="card">
-        <!-- Кнопка открытия бара музыки -->
         <button class="music-toggle-btn" id="toggle-btn" onclick="togglePlayerPanel()" title="Музыка">🎵</button>
 
         <div class="avatar-wrapper">
             <img class="avatar-img" src="avatar.png" onerror="this.src='https://picsum.photos/200'" alt="Avatar">
         </div>
 
-        <!-- Выезжающий бар музыки -->
-        <div class="music-bar" id="music-bar">
+        <div class="music-bar open" id="music-bar">
             <div class="player-row">
                 <div class="track-cover">💿</div>
                 <div class="track-info">
@@ -430,24 +422,20 @@
         const timeDur = document.getElementById('time-dur');
         const trackTitle = document.getElementById('track-title');
 
-        // Панель плеера
         function togglePlayerPanel() {
             musicBar.classList.toggle('open');
         }
 
         function togglePlay() {
             if (audio.paused) {
-                const playPromise = audio.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(() => {
-                        // Если локального файла grustinka.mp3 нет, включаем резервную рабочую онлайн-ссылку
-                        audio.src = "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=lofi-study-112191.mp3";
-                        audio.play().catch(() => {
-                            trackTitle.innerText = "Ошибка загрузки MP3!";
-                            trackTitle.style.color = "#ff3e3e";
-                        });
+                audio.play().catch(err => {
+                    console.log("Локальный файл не найден, попытка загрузить прямую ссылку...", err);
+                    audio.src = "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3";
+                    audio.play().catch(() => {
+                        trackTitle.innerText = "Файл grustinka.mp3 не найден!";
+                        trackTitle.style.color = "#ff3e3e";
                     });
-                }
+                });
             } else {
                 audio.pause();
             }
