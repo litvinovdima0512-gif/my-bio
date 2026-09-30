@@ -15,14 +15,12 @@
             --glow-cyan: #00f0ff;
             --neon-red: #ff3e3e;
         }
-
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
             -webkit-tap-highlight-color: transparent;
         }
-
         body {
             background-color: var(--bg-dark);
             background-image: 
@@ -37,7 +35,6 @@
             justify-content: center;
             padding: 24px 16px;
         }
-
         .card {
             background: var(--card-glass);
             backdrop-filter: blur(25px);
@@ -51,14 +48,36 @@
             text-align: center;
             position: relative;
         }
-
         .card::before {
             content: '';
             position: absolute;
             top: 0; left: 15%; right: 15%; height: 3px;
             background: linear-gradient(90deg, transparent, var(--glow-purple), var(--glow-cyan), transparent);
         }
-
+        .music-player {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        .music-player.playing {
+            animation: rotate 4s linear infinite;
+            border-color: var(--glow-cyan);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+        }
+        @keyframes rotate {
+            100% { transform: rotate(360deg); }
+        }
         .avatar-wrapper {
             position: relative;
             width: 110px;
@@ -70,7 +89,6 @@
             box-shadow: 0 0 25px rgba(188, 111, 241, 0.4);
             animation: pulse-glow 3s ease-in-out infinite;
         }
-
         .avatar-img {
             width: 100%;
             height: 100%;
@@ -79,12 +97,10 @@
             background: #111;
             display: block;
         }
-
         @keyframes pulse-glow {
             0%, 100% { transform: scale(1); box-shadow: 0 0 25px rgba(188, 111, 241, 0.4); }
             50% { transform: scale(1.03); box-shadow: 0 0 35px rgba(0, 240, 255, 0.6); }
         }
-
         h1 {
             font-size: 26px;
             font-weight: 800;
@@ -94,7 +110,6 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-
         .status-pill {
             display: inline-flex;
             align-items: center;
@@ -110,7 +125,6 @@
             padding: 6px 16px;
             border-radius: 100px;
         }
-
         .status-dot {
             width: 6px;
             height: 6px;
@@ -118,13 +132,11 @@
             border-radius: 50%;
             box-shadow: 0 0 8px var(--neon-red);
         }
-
         .stats-container {
             display: flex;
             gap: 8px;
             margin-bottom: 26px;
         }
-
         .stats-box {
             flex: 1;
             background: rgba(255, 255, 255, 0.03);
@@ -132,7 +144,6 @@
             padding: 12px 4px;
             border-radius: 16px;
         }
-
         .stats-label {
             font-size: 10px;
             color: var(--text-secondary);
@@ -141,12 +152,10 @@
             margin-bottom: 4px;
             letter-spacing: 0.5px;
         }
-
         .stats-value {
             font-size: 14px;
             font-weight: 800;
         }
-
         .btn-action {
             display: flex;
             align-items: center;
@@ -158,23 +167,17 @@
             font-size: 15px;
             margin-bottom: 12px;
             color: #ffffff;
-            transition: transform 0.2s ease, box-shadow 0.2s;
+            transition: transform 0.2s ease;
         }
-
-        .btn-action:active {
-            transform: scale(0.98);
-        }
-
+        .btn-action:active { transform: scale(0.98); }
         .btn-da {
             background: linear-gradient(135deg, #ff6b00, #ff8800);
             box-shadow: 0 5px 15px rgba(255, 107, 0, 0.25);
         }
-
         .btn-boost {
             background: linear-gradient(135deg, #00c853, #00b0ff);
             box-shadow: 0 5px 15px rgba(0, 200, 83, 0.25);
         }
-
         .row-link {
             display: flex;
             align-items: center;
@@ -190,18 +193,15 @@
             margin-bottom: 12px;
             transition: all 0.2s ease;
         }
-
         .row-link:hover, .row-link:active {
             background: rgba(255, 255, 255, 0.05);
             border-color: rgba(0, 240, 255, 0.3);
         }
-
         .row-arrow {
             color: var(--glow-cyan);
             font-size: 15px;
             font-weight: 700;
         }
-
         .panel-iris {
             margin-top: 22px;
             padding: 15px;
@@ -210,14 +210,12 @@
             border: 1px solid rgba(188, 111, 241, 0.15);
             text-align: left;
         }
-
         .iris-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 8px;
         }
-
         .iris-title {
             font-size: 11px;
             color: var(--text-secondary);
@@ -225,7 +223,6 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-
         .iris-link {
             font-size: 11px;
             color: var(--glow-purple);
@@ -233,7 +230,6 @@
             font-weight: 700;
             text-transform: uppercase;
         }
-
         code {
             font-family: 'Courier New', Courier, monospace;
             color: #d8b4fe;
@@ -249,9 +245,13 @@
 </head>
 <body>
 
+    <audio id="bg-audio" loop src="https://soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+
     <div class="card">
+        <div class="music-player" id="music-btn" onclick="toggleMusic()">🔇</div>
+
         <div class="avatar-wrapper">
-            <img class="avatar-img" src="avatar.png" onerror="this.src='https://unsplash.com'" alt="Avatar">
+            <img class="avatar-img" src="avatar.png" onerror="this.src='https://picsum.photos/200'" alt="Avatar">
         </div>
         
         <h1>Murzik : Dima</h1>
@@ -276,40 +276,56 @@
             </div>
         </div>
 
-        <!-- Кнопки донатов и бустов -->
-        <a href="https://donationalerts.com__" target="_blank" class="btn-action btn-da">
+        <a href="https://donationalerts.com" onclick="startMusic()" target="_blank" class="btn-action btn-da">
             <span>💎 Поддержать на DonationAlerts</span>
         </a>
         
-        <a href="https://t.me" target="_blank" class="btn-action btn-boost">
+        <a href="https://t.me" onclick="startMusic()" target="_blank" class="btn-action btn-boost">
             <span>🚀 Бустануть наш канал</span>
         </a>
         
-        <!-- Полный список ссылок внутри карточки -->
-        <a href="http://t.me" target="_blank" class="row-link">
-            <span>💬 Анон / Анонимные вопросы</span>
-            <span class="row-arrow">→</span>
-        </a>
-
-        <a href="https://t.me" target="_blank" class="row-link">
+        <a href="https://t.me" onclick="startMusic()" target="_blank" class="row-link">
             <span>👑 Лс: @Murrzilkaa</span>
             <span class="row-arrow">→</span>
         </a>
 
-        <a href="https://teletype.in" target="_blank" class="row-link">
+        <a href="https://teletype.in" onclick="startMusic()" target="_blank" class="row-link">
             <span>📖 Подробнее / Teletype</span>
             <span class="row-arrow">→</span>
         </a>
 
-        <!-- Блок Ириса -->
         <div class="panel-iris">
             <div class="iris-top">
                 <span class="iris-title">В ЛС ИРИСА</span>
                 <a href="https://t.me" target="_blank" class="iris-link">ОТПРАВИТЬ</a>
             </div>
-            <code>+саб @7127295961</code>
+            <code>+био</code>
         </div>
     </div>
 
+    <script>
+        const audio = document.getElementById('bg-audio');
+        const btn = document.getElementById('music-btn');
+
+        function toggleMusic() {
+            if (audio.paused) {
+                audio.play();
+                btn.innerText = "🎵";
+                btn.classList.add('playing');
+            } else {
+                audio.pause();
+                btn.innerText = "🔇";
+                btn.classList.remove('playing');
+            }
+        }
+
+        function startMusic() {
+            if (audio.paused) {
+                audio.play();
+                btn.innerText = "🎵";
+                btn.classList.add('playing');
+            }
+        }
+    </script>
 </body>
 </html>
