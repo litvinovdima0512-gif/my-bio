@@ -14,6 +14,8 @@
             --glow-purple: #bc6ff1;
             --glow-cyan: #00f0ff;
             --neon-red: #ff3e3e;
+            --beat-scale: 1;
+            --beat-glow: 0px;
         }
         * {
             box-sizing: border-box;
@@ -34,7 +36,10 @@
             align-items: center;
             justify-content: center;
             padding: 20px 16px;
+            overflow-x: hidden;
         }
+
+        /* Анимированная Карточка */
         .card {
             background: var(--card-glass);
             border: 1px solid var(--card-border);
@@ -42,10 +47,12 @@
             width: 100%;
             max-width: 380px;
             padding: 28px 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 var(--beat-glow) rgba(188, 111, 241, 0.4);
             text-align: center;
             position: relative;
-            transform: translateZ(0);
+            transform: scale(var(--beat-scale));
+            transition: transform 0.05s ease-out, box-shadow 0.05s ease-out;
+            will-change: transform, box-shadow;
         }
         .card::before {
             content: '';
@@ -54,7 +61,7 @@
             background: linear-gradient(90deg, transparent, var(--glow-purple), var(--glow-cyan), transparent);
         }
 
-        /* Кнопка открытия музыки */
+        /* Кнопка открытия плеера */
         .music-toggle-btn {
             position: absolute;
             top: 18px;
@@ -75,7 +82,7 @@
         .music-toggle-btn svg {
             width: 18px;
             height: 18px;
-            fill: #fff;
+            fill: #ffffff;
         }
 
         .music-bar {
@@ -103,7 +110,6 @@
             text-align: left;
         }
         
-        /* Винил обложка */
         .track-cover {
             width: 38px;
             height: 38px;
@@ -143,7 +149,6 @@
             color: var(--text-secondary);
         }
 
-        /* Кнопка Play / Pause */
         .play-btn {
             background: linear-gradient(135deg, var(--glow-purple), var(--glow-cyan));
             border: none;
@@ -161,11 +166,7 @@
         .play-btn svg {
             width: 14px;
             height: 14px;
-            fill: #fff;
-            margin-left: 1px;
-        }
-        .play-btn.playing svg {
-            margin-left: 0;
+            fill: #ffffff;
         }
         
         .progress-container {
@@ -195,14 +196,65 @@
             min-width: 26px;
         }
 
+        /* --- "ЖИВАЯ" АВАТАРКА С АНИМАЦИЯМИ --- */
+        .avatar-container {
+            position: relative;
+            width: 104px;
+            height: 104px;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Эквалайзер вокруг аватарки (Canvas) */
+        #visualizer-canvas {
+            position: absolute;
+            top: -15px;
+            left: -15px;
+            width: 134px;
+            height: 134px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Пульсирующие волны баса */
+        .pulse-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid var(--glow-purple);
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(1);
+        }
+        .playing .pulse-ring {
+            animation: ringPulse 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        @keyframes ringPulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            100% { transform: scale(1.45); opacity: 0; }
+        }
+
         .avatar-wrapper {
+            position: relative;
+            z-index: 2;
             width: 96px;
             height: 96px;
-            margin: 0 auto 16px;
             border-radius: 50%;
             padding: 3px;
             background: linear-gradient(135deg, var(--glow-purple), var(--glow-cyan));
+            box-shadow: 0 0 15px rgba(188, 111, 241, 0.4);
+            /* Анимация плавного "дыхания" аватарки в покое */
+            animation: floatAvatar 4s ease-in-out infinite;
+            will-change: transform, box-shadow;
         }
+        @keyframes floatAvatar {
+            0%, 100% { transform: translateY(0) scale(1); box-shadow: 0 0 15px rgba(188, 111, 241, 0.4); }
+            50% { transform: translateY(-4px) scale(1.02); box-shadow: 0 0 25px rgba(0, 240, 255, 0.6); }
+        }
+
         .avatar-img {
             width: 100%;
             height: 100%;
@@ -211,6 +263,7 @@
             background: #111;
             display: block;
         }
+
         h1 {
             font-size: 24px;
             font-weight: 800;
@@ -341,25 +394,24 @@
 </head>
 <body>
 
-    <!-- Аудио -->
-    <audio id="bg-audio" loop preload="auto">
-        <source src="grustinka.mp3" type="audio/mpeg">
-        <source src="./grustinka.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="bg-audio" loop crossorigin="anonymous" preload="auto" src="grustinka.mp3"></audio>
 
-    <div class="card">
-        <!-- Кнопка ноты -->
+    <div class="card" id="card">
         <button class="music-toggle-btn" id="toggle-btn" onclick="togglePlayerPanel()" title="Музыка">
             <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
         </button>
 
-        <div class="avatar-wrapper">
-            <img class="avatar-img" src="avatar.png" onerror="this.src='https://picsum.photos/200'" alt="Avatar">
+        <!-- Аватарка с волнами и канвасом под бит -->
+        <div class="avatar-container" id="avatar-container">
+            <div class="pulse-ring"></div>
+            <canvas id="visualizer-canvas" width="134" height="134"></canvas>
+            <div class="avatar-wrapper">
+                <img class="avatar-img" src="avatar.png" onerror="this.src='https://picsum.photos/200'" alt="Avatar">
+            </div>
         </div>
 
         <div class="music-bar open" id="music-bar">
             <div class="player-row">
-                <!-- Виниловый диск SVG -->
                 <div class="track-cover">
                     <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5zm0-5.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"/></svg>
                 </div>
@@ -367,7 +419,6 @@
                     <div class="track-title" id="track-title">Грустинка</div>
                     <div class="track-artist">onokami</div>
                 </div>
-                <!-- Кнопка Play/Pause SVG -->
                 <button class="play-btn" id="main-play-btn" onclick="manualPlay()">
                     <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                 </button>
@@ -443,28 +494,102 @@
         const progressFill = document.getElementById('progress-fill');
         const timeCurr = document.getElementById('time-curr');
         const timeDur = document.getElementById('time-dur');
-        const trackTitle = document.getElementById('track-title');
+        const avatarContainer = document.getElementById('avatar-container');
+        const canvas = document.getElementById('visualizer-canvas');
+        const ctx = canvas.getContext('2d');
 
         const SVG_PLAY = '<path d="M8 5v14l11-7z"/>';
         const SVG_PAUSE = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
 
+        let audioCtx, analyser, dataArray;
+        let isAudioSetup = false;
         let userInteracted = false;
+
+        function initAudioContext() {
+            if (isAudioSetup) return;
+            try {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 64;
+                const source = audioCtx.createMediaElementSource(audio);
+                source.connect(analyser);
+                analyser.connect(audioCtx.destination);
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+                isAudioSetup = true;
+                drawVisualizer();
+            } catch (e) {
+                console.log("AudioContext не поддерживается или локальный файл заблокирован CORS", e);
+            }
+        }
+
+        // Рисование кругового эквалайзера и бит-эффекта
+        function drawVisualizer() {
+            requestAnimationFrame(drawVisualizer);
+            if (!analyser || audio.paused) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                document.documentElement.style.setProperty('--beat-scale', '1');
+                document.documentElement.style.setProperty('--beat-glow', '0px');
+                return;
+            }
+
+            analyser.getByteFrequencyData(dataArray);
+
+            // Вычисляем среднюю силу баса (первые бины частот)
+            let bassSum = 0;
+            for (let i = 0; i < 6; i++) {
+                bassSum += dataArray[i];
+            }
+            let bassAvg = bassSum / 6; // значение 0..255
+
+            // Эффект прокачки всей карточки под бит баса
+            let scaleVal = 1 + (bassAvg / 255) * 0.04;
+            let glowVal = (bassAvg / 255) * 25px;
+            document.documentElement.style.setProperty('--beat-scale', scaleVal.toFixed(3));
+            document.documentElement.style.setProperty('--beat-glow', glowVal.toFixed(1) + 'px');
+
+            // Очистка холста
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = 54;
+            const bars = 32;
+
+            for (let i = 0; i < bars; i++) {
+                let value = dataArray[i % dataArray.length] || 0;
+                let barHeight = (value / 255) * 16;
+
+                let angle = (i * 360 / bars) * Math.PI / 180;
+                let x1 = centerX + Math.cos(angle) * radius;
+                let y1 = centerY + Math.sin(angle) * radius;
+                let x2 = centerX + Math.cos(angle) * (radius + barHeight);
+                let y2 = centerY + Math.sin(angle) * (radius + barHeight);
+
+                ctx.strokeStyle = i % 2 === 0 ? '#bc6ff1' : '#00f0ff';
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+            }
+        }
 
         function togglePlayerPanel() {
             musicBar.classList.toggle('open');
         }
 
         function manualPlay() {
+            initAudioContext();
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
             if (audio.paused) {
                 audio.play().then(() => {
                     userInteracted = true;
                 }).catch(() => {
-                    // Резервный источник, если файл на сервере ещё загружается
-                    audio.src = "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3";
-                    audio.play().catch(() => {
-                        trackTitle.innerText = "Ошибка воспроизведения";
-                        trackTitle.style.color = "#ff3e3e";
-                    });
+                    audio.src = "https://uzko.net/files/2026/06/onokami_-_Grustinka_(Uzko.net).mp3";
+                    audio.play().catch(() => {});
                 });
             } else {
                 audio.pause();
@@ -473,6 +598,10 @@
 
         document.addEventListener('click', () => {
             if (!userInteracted && audio.paused) {
+                initAudioContext();
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
                 audio.play().then(() => {
                     userInteracted = true;
                 }).catch(() => {});
@@ -481,14 +610,14 @@
 
         audio.addEventListener('play', () => {
             playIcon.innerHTML = SVG_PAUSE;
-            mainPlayBtn.classList.add('playing');
             musicBar.classList.add('playing');
+            avatarContainer.classList.add('playing');
         });
 
         audio.addEventListener('pause', () => {
             playIcon.innerHTML = SVG_PLAY;
-            mainPlayBtn.classList.remove('playing');
             musicBar.classList.remove('playing');
+            avatarContainer.classList.remove('playing');
         });
 
         audio.addEventListener('loadedmetadata', () => {
