@@ -39,7 +39,6 @@
             overflow-x: hidden;
         }
 
-        /* Анимированная Карточка */
         .card {
             background: var(--card-glass);
             border: 1px solid var(--card-border);
@@ -50,8 +49,9 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 var(--beat-glow) rgba(188, 111, 241, 0.4);
             text-align: center;
             position: relative;
+            -webkit-transform: scale(var(--beat-scale));
             transform: scale(var(--beat-scale));
-            transition: transform 0.05s ease-out, box-shadow 0.05s ease-out;
+            transition: transform 0.05s linear, box-shadow 0.05s linear;
             will-change: transform, box-shadow;
         }
         .card::before {
@@ -61,7 +61,7 @@
             background: linear-gradient(90deg, transparent, var(--glow-purple), var(--glow-cyan), transparent);
         }
 
-        /* Кнопка открытия плеера */
+        /* Кнопка открытия/закрытия музыки */
         .music-toggle-btn {
             position: absolute;
             top: 18px;
@@ -75,33 +75,35 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: border-color 0.2s, transform 0.15s;
-            z-index: 10;
+            transition: border-color 0.2s, transform 0.15s, background 0.2s;
+            z-index: 20;
         }
         .music-toggle-btn:active { transform: scale(0.92); }
         .music-toggle-btn svg {
             width: 18px;
             height: 18px;
             fill: #ffffff;
+            pointer-events: none;
         }
 
+        /* Музыкальный бар */
         .music-bar {
             max-height: 0;
             opacity: 0;
             overflow: hidden;
-            transition: max-height 0.25s ease, opacity 0.25s ease, padding 0.25s ease;
+            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, margin 0.3s ease, padding 0.3s ease;
             background: rgba(10, 12, 20, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            border: 0px solid rgba(255, 255, 255, 0);
             border-radius: 16px;
             margin-bottom: 0;
             padding: 0 12px;
         }
         .music-bar.open {
-            max-height: 110px;
+            max-height: 120px;
             opacity: 1;
             padding: 12px;
             margin-bottom: 18px;
-            border-color: rgba(188, 111, 241, 0.35);
+            border: 1px solid rgba(188, 111, 241, 0.35);
         }
         .player-row {
             display: flex;
@@ -128,8 +130,10 @@
             fill: var(--glow-cyan);
         }
         .music-bar.playing .track-cover {
+            -webkit-animation: spin 6s linear infinite;
             animation: spin 6s linear infinite;
         }
+        @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
         @keyframes spin { 100% { transform: rotate(360deg); } }
         
         .track-info {
@@ -167,6 +171,7 @@
             width: 14px;
             height: 14px;
             fill: #ffffff;
+            pointer-events: none;
         }
         
         .progress-container {
@@ -196,41 +201,46 @@
             min-width: 26px;
         }
 
-        /* --- "ЖИВАЯ" АВАТАРКА С АНИМАЦИЯМИ --- */
+        /* --- ИСПРАВЛЕННЫЙ КОНТЕЙНЕР АВАРАРКИ ДЛЯ ВСЕХ БРАУЗЕРОВ --- */
         .avatar-container {
             position: relative;
-            width: 104px;
-            height: 104px;
+            width: 120px;
+            height: 120px;
             margin: 0 auto 16px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        /* Эквалайзер вокруг аватарки (Canvas) */
         #visualizer-canvas {
             position: absolute;
-            top: -15px;
-            left: -15px;
-            width: 134px;
-            height: 134px;
+            top: 0;
+            left: 0;
+            width: 120px;
+            height: 120px;
             pointer-events: none;
             z-index: 1;
         }
 
-        /* Пульсирующие волны баса */
         .pulse-ring {
             position: absolute;
-            width: 100%;
-            height: 100%;
+            top: 12px;
+            left: 12px;
+            width: 96px;
+            height: 96px;
             border-radius: 50%;
             border: 2px solid var(--glow-purple);
             opacity: 0;
             pointer-events: none;
-            transform: scale(1);
+            box-sizing: border-box;
         }
         .playing .pulse-ring {
+            -webkit-animation: ringPulse 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
             animation: ringPulse 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        @-webkit-keyframes ringPulse {
+            0% { -webkit-transform: scale(0.95); opacity: 0.8; }
+            100% { -webkit-transform: scale(1.45); opacity: 0; }
         }
         @keyframes ringPulse {
             0% { transform: scale(0.95); opacity: 0.8; }
@@ -246,9 +256,13 @@
             padding: 3px;
             background: linear-gradient(135deg, var(--glow-purple), var(--glow-cyan));
             box-shadow: 0 0 15px rgba(188, 111, 241, 0.4);
-            /* Анимация плавного "дыхания" аватарки в покое */
+            -webkit-animation: floatAvatar 4s ease-in-out infinite;
             animation: floatAvatar 4s ease-in-out infinite;
             will-change: transform, box-shadow;
+        }
+        @-webkit-keyframes floatAvatar {
+            0%, 100% { -webkit-transform: translateY(0) scale(1); box-shadow: 0 0 15px rgba(188, 111, 241, 0.4); }
+            50% { -webkit-transform: translateY(-4px) scale(1.02); box-shadow: 0 0 25px rgba(0, 240, 255, 0.6); }
         }
         @keyframes floatAvatar {
             0%, 100% { transform: translateY(0) scale(1); box-shadow: 0 0 15px rgba(188, 111, 241, 0.4); }
@@ -394,17 +408,20 @@
 </head>
 <body>
 
-    <audio id="bg-audio" loop crossorigin="anonymous" preload="auto" src="grustinka.mp3"></audio>
+    <!-- Подгрузка трека -->
+    <audio id="bg-audio" loop preload="auto">
+        <source src="grustinka.mp3" type="audio/mpeg">
+        <source src="./grustinka.mp3" type="audio/mpeg">
+    </audio>
 
     <div class="card" id="card">
-        <button class="music-toggle-btn" id="toggle-btn" onclick="togglePlayerPanel()" title="Музыка">
+        <button class="music-toggle-btn" id="toggle-btn" onclick="togglePlayerPanel(event)" title="Музыка">
             <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
         </button>
 
-        <!-- Аватарка с волнами и канвасом под бит -->
         <div class="avatar-container" id="avatar-container">
             <div class="pulse-ring"></div>
-            <canvas id="visualizer-canvas" width="134" height="134"></canvas>
+            <canvas id="visualizer-canvas" width="120" height="120"></canvas>
             <div class="avatar-wrapper">
                 <img class="avatar-img" src="avatar.png" onerror="this.src='https://picsum.photos/200'" alt="Avatar">
             </div>
@@ -419,7 +436,7 @@
                     <div class="track-title" id="track-title">Грустинка</div>
                     <div class="track-artist">onokami</div>
                 </div>
-                <button class="play-btn" id="main-play-btn" onclick="manualPlay()">
+                <button class="play-btn" id="main-play-btn" onclick="manualPlay(event)">
                     <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                 </button>
             </div>
@@ -503,7 +520,6 @@
 
         let audioCtx, analyser, dataArray;
         let isAudioSetup = false;
-        let userInteracted = false;
 
         function initAudioContext() {
             if (isAudioSetup) return;
@@ -518,11 +534,10 @@
                 isAudioSetup = true;
                 drawVisualizer();
             } catch (e) {
-                console.log("AudioContext не поддерживается или локальный файл заблокирован CORS", e);
+                // Если заблокирован CORS или браузер запрещает доступ
             }
         }
 
-        // Рисование кругового эквалайзера и бит-эффекта
         function drawVisualizer() {
             requestAnimationFrame(drawVisualizer);
             if (!analyser || audio.paused) {
@@ -534,30 +549,27 @@
 
             analyser.getByteFrequencyData(dataArray);
 
-            // Вычисляем среднюю силу баса (первые бины частот)
             let bassSum = 0;
             for (let i = 0; i < 6; i++) {
                 bassSum += dataArray[i];
             }
-            let bassAvg = bassSum / 6; // значение 0..255
+            let bassAvg = bassSum / 6;
 
-            // Эффект прокачки всей карточки под бит баса
-            let scaleVal = 1 + (bassAvg / 255) * 0.04;
-            let glowVal = (bassAvg / 255) * 25px;
+            let scaleVal = 1 + (bassAvg / 255) * 0.035;
+            let glowVal = (bassAvg / 255) * 20;
             document.documentElement.style.setProperty('--beat-scale', scaleVal.toFixed(3));
             document.documentElement.style.setProperty('--beat-glow', glowVal.toFixed(1) + 'px');
 
-            // Очистка холста
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            const radius = 54;
-            const bars = 32;
+            const radius = 50;
+            const bars = 28;
 
             for (let i = 0; i < bars; i++) {
                 let value = dataArray[i % dataArray.length] || 0;
-                let barHeight = (value / 255) * 16;
+                let barHeight = (value / 255) * 12;
 
                 let angle = (i * 360 / bars) * Math.PI / 180;
                 let x1 = centerX + Math.cos(angle) * radius;
@@ -566,7 +578,7 @@
                 let y2 = centerY + Math.sin(angle) * (radius + barHeight);
 
                 ctx.strokeStyle = i % 2 === 0 ? '#bc6ff1' : '#00f0ff';
-                ctx.lineWidth = 3;
+                ctx.lineWidth = 2.5;
                 ctx.lineCap = 'round';
                 ctx.beginPath();
                 ctx.moveTo(x1, y1);
@@ -575,36 +587,35 @@
             }
         }
 
-        function togglePlayerPanel() {
+        /* Переключение видимости музыкальной панели */
+        function togglePlayerPanel(e) {
+            if(e) e.stopPropagation();
             musicBar.classList.toggle('open');
         }
 
-        function manualPlay() {
+        function manualPlay(e) {
+            if(e) e.stopPropagation();
             initAudioContext();
             if (audioCtx && audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
             if (audio.paused) {
-                audio.play().then(() => {
-                    userInteracted = true;
-                }).catch(() => {
-                    audio.src = "https://uzko.net/files/2026/06/onokami_-_Grustinka_(Uzko.net).mp3";
-                    audio.play().catch(() => {});
-                });
+                audio.play().catch(() => {});
             } else {
                 audio.pause();
             }
         }
 
-        document.addEventListener('click', () => {
-            if (!userInteracted && audio.paused) {
+        document.addEventListener('click', (e) => {
+            // Если кликнули на кнопки — автовопроизведение не перехватывает
+            if (e.target.closest('.music-toggle-btn') || e.target.closest('.play-btn') || e.target.closest('.progress-bar')) return;
+            
+            if (audio.paused) {
                 initAudioContext();
                 if (audioCtx && audioCtx.state === 'suspended') {
                     audioCtx.resume();
                 }
-                audio.play().then(() => {
-                    userInteracted = true;
-                }).catch(() => {});
+                audio.play().catch(() => {});
             }
         }, { once: true });
 
@@ -634,6 +645,7 @@
         });
 
         function seek(e) {
+            if(e) e.stopPropagation();
             const bar = document.getElementById('progress-bar');
             const rect = bar.getBoundingClientRect();
             const clickX = e.clientX - rect.left;
