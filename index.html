@@ -45,7 +45,7 @@
             border-radius: 24px;
             width: 100%;
             max-width: 380px;
-            padding: 24px 20px;
+            padding: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 var(--beat-glow) rgba(188, 111, 241, 0.5);
             text-align: center;
             position: relative;
@@ -60,11 +60,17 @@
             background: linear-gradient(90deg, transparent, var(--glow-purple), var(--glow-cyan), transparent);
         }
 
-        /* Кнопка вызова музыки */
+        /* Верхняя панель управления карточкой */
+        .card-header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 8px;
+            height: 38px;
+        }
+
+        /* Кнопка динамика в потоке элементов */
         .music-toggle-btn {
-            position: absolute;
-            top: 18px;
-            right: 18px;
             background: rgba(255, 255, 255, 0.06);
             border: 1px solid rgba(255, 255, 255, 0.12);
             width: 38px;
@@ -75,7 +81,6 @@
             align-items: center;
             justify-content: center;
             transition: border-color 0.2s, transform 0.15s, background 0.2s;
-            z-index: 10;
         }
         .music-toggle-btn:active { transform: scale(0.92); }
         .music-toggle-btn svg {
@@ -85,7 +90,7 @@
             pointer-events: none;
         }
 
-        /* Плеер (расположен БЕЗ наложения на аватарку) */
+        /* Плеер между кнопкой и аватаркой */
         .music-bar-container {
             max-height: 0;
             opacity: 0;
@@ -199,7 +204,7 @@
             min-width: 24px;
         }
 
-        /* --- ЭПИЧЕСКАЯ АВАРАРКА С ЭКВАЛАЙЗЕРОМ --- */
+        /* --- ЭКВАЛАЙЗЕР И АВАТАРКА --- */
         .avatar-container {
             position: relative;
             width: 150px;
@@ -220,7 +225,6 @@
             z-index: 1;
         }
 
-        /* Волны баса под ритм */
         .pulse-ring-1, .pulse-ring-2 {
             position: absolute;
             width: 96px;
@@ -404,11 +408,14 @@
     <audio id="bg-audio" loop preload="auto" src="grustinka.mp3"></audio>
 
     <div class="card" id="card">
-        <button class="music-toggle-btn" id="toggle-btn" onclick="togglePlayerPanel(event)" title="Музыка">
-            <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
-        </button>
+        <!-- Шапка с кнопкой переключения -->
+        <div class="card-header">
+            <button class="music-toggle-btn" id="toggle-btn" onclick="togglePlayerPanel(event)" title="Музыка">
+                <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+            </button>
+        </div>
 
-        <!-- Плеер открывается плавно и не перекрывает аватарку -->
+        <!-- Выпадающий плеер -->
         <div class="music-bar-container open" id="music-bar">
             <div class="music-bar-box">
                 <div class="player-row">
@@ -533,7 +540,6 @@
             }
         }
 
-        // Эпический круговой эквалайзер с неоновой подсветкой
         function drawVisualizer() {
             requestAnimationFrame(drawVisualizer);
             if (!analyser || audio.paused) {
@@ -546,20 +552,17 @@
 
             analyser.getByteFrequencyData(dataArray);
 
-            // Вычисление силы баса
             let bassSum = 0;
             for (let i = 0; i < 5; i++) bassSum += dataArray[i];
             let rawBass = bassSum / 5;
 
-            smoothBass += (rawBass - smoothBass) * 0.2; // Быстрая и плавная реакция
+            smoothBass += (rawBass - smoothBass) * 0.2;
 
-            // Пульсация всей карточки и подсветки аватарки
             let scaleVal = 1 + (smoothBass / 255) * 0.045;
             let glowVal = (smoothBass / 255) * 30;
             document.documentElement.style.setProperty('--beat-scale', scaleVal.toFixed(3));
             document.documentElement.style.setProperty('--beat-glow', glowVal.toFixed(1) + 'px');
 
-            // Яркий неоновый отблик на аватарке от баса
             avatarWrapper.style.boxShadow = `0 0 ${20 + glowVal}px rgba(0, 240, 255, ${(smoothBass / 255).toFixed(2)})`;
 
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -579,7 +582,6 @@
                 let x2 = centerX + Math.cos(angle) * (radius + barHeight);
                 let y2 = centerY + Math.sin(angle) * (radius + barHeight);
 
-                // Отрисовка длинных ярких лучей
                 ctx.strokeStyle = i % 2 === 0 ? '#bc6ff1' : '#00f0ff';
                 ctx.shadowColor = i % 2 === 0 ? '#bc6ff1' : '#00f0ff';
                 ctx.shadowBlur = barHeight > 5 ? 8 : 2;
