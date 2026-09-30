@@ -3,324 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Murzik & Dima | Premium Bio</title>
+    <title>Murzik & Dima | Bio</title>
     <style>
         :root {
-            --bg-dark: #06070d;
-            --card-glass: rgba(18, 20, 32, 0.7);
-            --card-border: rgba(168, 85, 247, 0.2);
-            --text-primary: #f8fafc;
-            --text-secondary: #94a3b8;
-            --glow-purple: #bc6ff1;
-            --glow-cyan: #00f0ff;
-            --neon-red: #ff3e3e;
+            --bg: #0b0c10;
+            --card: #161823;
+            --border: rgba(168, 85, 247, 0.25);
+            --text: #f8fafc;
+            --muted: #94a3b8;
+            --purple: #bc6ff1;
+            --cyan: #00f0ff;
         }
-
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            -webkit-tap-highlight-color: transparent;
         }
-
         body {
-            background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(at 0% 0%, rgba(188, 111, 241, 0.12) 0px, transparent 50%),
-                radial-gradient(at 100% 100%, rgba(0, 240, 255, 0.08) 0px, transparent 50%);
-            color: var(--text-primary);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, system-ui, BlinkMacSystemFont, sans-serif;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 24px 16px;
+            padding: 20px 16px;
         }
-
         .card {
-            background: var(--card-glass);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--card-border);
-            border-radius: 28px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
             width: 100%;
-            max-width: 390px;
-            padding: 36px 24px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(188, 111, 241, 0.05);
+            max-width: 380px;
+            padding: 30px 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
             text-align: center;
             position: relative;
         }
-
-        /* Тонкий светящийся индикатор сверху */
         .card::before {
             content: '';
             position: absolute;
-            top: 0; left: 10%; right: 10%; height: 3px;
-            background: linear-gradient(90deg, transparent, var(--glow-purple), var(--glow-cyan), transparent);
+            top: 0; left: 0; right: 0; height: 4px;
+            background: linear-gradient(90deg, var(--purple), var(--cyan), var(--purple));
+            border-radius: 24px 24px 0 0;
         }
-
-        .avatar-glow {
-            position: relative;
-            width: 96px;
-            height: 96px;
-            margin: 0 auto 20px;
-            background: linear-gradient(135deg, #7c3aed, #c084fc);
+        .avatar {
+            width: 86px;
+            height: 86px;
+            background: linear-gradient(135deg, #8b5cf6, #d946ef);
             border-radius: 50%;
+            margin: 0 auto 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 0 25px rgba(188, 111, 241, 0.35);
+            font-size: 38px;
+            box-shadow: 0 0 20px rgba(217,70,239,0.3);
         }
-
-        .avatar-img {
-            font-size: 42px;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-
-        h1 {
-            font-size: 26px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            margin-bottom: 10px;
-            background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: 28px;
-            background: rgba(255, 62, 62, 0.1);
-            border: 1px solid rgba(255, 62, 62, 0.2);
-            color: var(--neon-red);
+        h1 { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
+        .status {
+            display: inline-block;
+            margin-bottom: 24px;
+            background: rgba(255,56,56,0.1);
+            border: 1px solid rgba(255,56,56,0.25);
+            color: #ff3838;
             font-size: 11px;
-            font-weight: 700;
+            font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 1px;
             padding: 6px 14px;
             border-radius: 100px;
         }
-
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            background-color: var(--neon-red);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--neon-red);
-        }
-
-        .stats-container {
+        .grid {
             display: flex;
-            gap: 10px;
-            margin-bottom: 28px;
+            justify-content: space-between;
+            gap: 8px;
+            margin-bottom: 24px;
         }
-
-        .stats-box {
+        .box {
             flex: 1;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 12px 6px;
-            border-radius: 16px;
+            background: rgba(255,255,255,0.03);
+            padding: 10px 4px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
-
-        .stats-label {
-            font-size: 10px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            font-weight: 700;
-            margin-bottom: 4px;
-            letter-spacing: 0.5px;
+        .lbl { font-size: 10px; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; font-weight: 700; }
+        .val { font-size: 14px; font-weight: 800; }
+        .btn {
+            display: flex; align-items: center; justify-content: center;
+            text-decoration: none; padding: 14px; border-radius: 14px;
+            font-weight: 700; font-size: 14px; margin-bottom: 12px;
+            color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
-
-        .stats-value {
-            font-size: 15px;
-            font-weight: 800;
+        .btn-d { background: linear-gradient(135deg, #ff7b00, #ffae00); box-shadow: 0 4px 15px rgba(255,123,0,0.2); }
+        .btn-b { background: linear-gradient(135deg, #00e676, #00b0ff); box-shadow: 0 4px 15px rgba(0,230,118,0.15); }
+        .link {
+            display: flex; align-items: center; justify-content: space-between;
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+            color: #e2e8f0; text-decoration: none; padding: 14px 16px;
+            border-radius: 14px; font-size: 14px; font-weight: 600; margin-bottom: 12px;
         }
-
-        .btn-action {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            text-decoration: none;
-            padding: 16px;
-            border-radius: 16px;
-            font-weight: 700;
-            font-size: 15px;
-            margin-bottom: 12px;
-            color: #ffffff;
-            transition: transform 0.2s ease;
+        .act { color: var(--cyan); font-size: 12px; font-weight: 700; }
+        .iris {
+            margin-top: 20px; padding: 14px; background: rgba(0,0,0,0.2);
+            border-radius: 16px; border: 1px solid rgba(188,111,241,0.15); text-align: left;
         }
-
-        .btn-action:active {
-            transform: scale(0.98);
-        }
-
-        .btn-da {
-            background: linear-gradient(135deg, #ff6b00, #ff8800);
-            box-shadow: 0 6px 20px rgba(255, 107, 0, 0.25);
-        }
-
-        .btn-boost {
-            background: linear-gradient(135deg, #00c853, #00b0ff);
-            box-shadow: 0 6px 20px rgba(0, 200, 83, 0.2);
-        }
-
-        .row-link {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            color: #e2e8f0;
-            text-decoration: none;
-            padding: 15px 18px;
-            border-radius: 16px;
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            transition: background 0.2s, border-color 0.2s;
-        }
-
-        .row-link:hover, .row-link:active {
-            background: rgba(255, 255, 255, 0.04);
-            border-color: rgba(0, 240, 255, 0.25);
-        }
-
-        .row-arrow {
-            color: var(--glow-cyan);
-            font-size: 16px;
-            font-weight: 700;
-        }
-
-        .panel-iris {
-            margin-top: 24px;
-            padding: 16px;
-            background: rgba(0, 0, 0, 0.25);
-            border-radius: 18px;
-            border: 1px solid rgba(188, 111, 241, 0.15);
-            text-align: left;
-        }
-
-        .iris-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .iris-title {
-            font-size: 11px;
-            color: var(--text-secondary);
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .iris-link {
-            font-size: 12px;
-            color: var(--glow-purple);
-            text-decoration: none;
-            font-weight: 700;
-        }
-
+        .iris-hd { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; }
+        .iris-btn { color: var(--purple); text-decoration: none; }
         code {
-            font-family: 'Courier New', Courier, monospace;
-            color: #d8b4fe;
-            font-size: 13px;
-            display: block;
-            background: rgba(0, 0, 0, 0.4);
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid rgba(188, 111, 241, 0.08);
-            font-weight: 700;
+            font-family: monospace; color: #e0aaff; font-size: 13px; display: block;
+            background: rgba(0,0,0,0.3); padding: 8px; border-radius: 6px; border: 1px solid rgba(188,111,241,0.1); font-weight: bold;
         }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 16px;
-            margin-top: 24px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .footer-links a {
-            color: var(--text-secondary);
-            text-decoration: none;
-        }
-
-        .footer-links span {
-            color: rgba(255, 255, 255, 0.08);
-        }
+        .foot { display: flex; justify-content: center; gap: 16px; margin-top: 20px; font-size: 13px; font-weight: 600; }
+        .foot a { color: var(--muted); text-decoration: none; }
     </style>
 </head>
 <body>
 
     <div class="card">
-        <div class="avatar-glow">
-            <div class="avatar-img">🐱‍👤</div>
-        </div>
-        
+        <div class="avatar">🐱‍👤</div>
         <h1>Murzik : Dima</h1>
-        
-        <div class="status-pill">
-            <span class="status-dot"></span>
-            НЕ ИЩУ ОБЩЕНИЯ!!
+        <div class="status">НЕ ИЩУ ОБЩЕНИЯ!!</div>
+
+        <div class="grid">
+            <div class="box"><div class="lbl">Возраст</div><div class="val" style="color:var(--purple);">Секрет</div></div>
+            <div class="box"><div class="lbl">Рост</div><div class="val">178 см</div></div>
+            <div class="box"><div class="lbl">Бд</div><div class="val">22 Мая</div></div>
         </div>
 
-        <div class="stats-container">
-            <div class="stats-box">
-                <div class="stats-label">Возраст</div>
-                <div class="stats-value" style="color: var(--glow-purple);">Секрет</div>
-            </div>
-            <div class="stats-box">
-                <div class="stats-label">Рост</div>
-                <div class="stats-value">178 см</div>
-            </div>
-            <div class="stats-box">
-                <div class="stats-label">Бд</div>
-                <div class="stats-value">22 Мая</div>
-            </div>
-        </div>
-
-        <a href="https://donationalerts.com__" target="_blank" class="btn-action btn-da">
-            <span>💎 Поддержать на DonationAlerts</span>
+        <a href="https://donationalerts.com__" target="_blank" class="btn btn-d">💎 Поддержать на DonationAlerts</a>
+        <a href="https://t.me" target="_blank" class="btn btn-b">🚀 Бустануть наш канал</a>
+        
+        <a href="https://t.me" target="_blank" class="link">
+            <span>👑 Лс: @Murrzilkaa</span><span class="act">Перейти →</span>
         </a>
         
-        <a href="https://t.me" target="_blank" class="btn-action btn-boost">
-            <span>🚀 Бустануть наш канал</span>
-        </a>
-        
-        <a href="https://t.me" target="_blank" class="row-link">
-            <span>👑 Лс: @Murrzilkaa</span>
-            <span class="row-arrow">→</span>
-        </a>
-        
-        <a href="http://t.me" target="_blank" class="row-link">
-            <span>💬 Анонимные вопросы</span>
-            <span class="row-arrow">→</span>
+        <a href="http://t.me" target="_blank" class="link">
+            <span>💬 Анонимные вопросы</span><span class="act">Написать →</span>
         </a>
 
-        <div class="panel-iris">
-            <div class="iris-top">
-                <span class="iris-title">Команда для ЛС Ириса</span>
-                <a href="https://t.me" target="_blank" class="iris-link">Отправить</a>
-            </div>
+        <div class="iris">
+            <div class="iris-hd"><span>В ЛС ИРИСА</span><a href="https://t.me" target="_blank" class="iris-btn">ОТПРАВИТЬ →</a></div>
             <code>+саб @7127295961</code>
         </div>
     </div>
 
-    <div class="footer-links">
+    <div class="foot">
         <a href="http://t.me" target="_blank">Анон</a>
-        <span>•</span>
+        <span style="color:rgba(255,255,255,0.1)">•</span>
         <a href="https://t.me" target="_blank">Лс</a>
-        <span>•</span>
+        <span style="color:rgba(255,255,255,0.1)">•</span>
+        <a href="https://teletype.in" target="_blank">Подробнее</a>
+    </div>
+
+</body>
+</html>
