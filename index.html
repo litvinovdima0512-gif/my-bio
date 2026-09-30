@@ -39,6 +39,7 @@
             overflow-x: hidden;
         }
 
+        /* Карточка профиля */
         .card {
             background: var(--card-glass);
             border: 1px solid var(--card-border);
@@ -49,9 +50,8 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 var(--beat-glow) rgba(188, 111, 241, 0.4);
             text-align: center;
             position: relative;
-            -webkit-transform: scale(var(--beat-scale));
             transform: scale(var(--beat-scale));
-            transition: transform 0.05s linear, box-shadow 0.05s linear;
+            transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
             will-change: transform, box-shadow;
         }
         .card::before {
@@ -61,7 +61,7 @@
             background: linear-gradient(90deg, transparent, var(--glow-purple), var(--glow-cyan), transparent);
         }
 
-        /* Кнопка открытия/закрытия музыки */
+        /* Кнопка динамика */
         .music-toggle-btn {
             position: absolute;
             top: 18px;
@@ -76,7 +76,7 @@
             align-items: center;
             justify-content: center;
             transition: border-color 0.2s, transform 0.15s, background 0.2s;
-            z-index: 20;
+            z-index: 30;
         }
         .music-toggle-btn:active { transform: scale(0.92); }
         .music-toggle-btn svg {
@@ -86,25 +86,30 @@
             pointer-events: none;
         }
 
-        /* Музыкальный бар */
-        .music-bar {
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
-            transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, margin 0.3s ease, padding 0.3s ease;
-            background: rgba(10, 12, 20, 0.85);
-            border: 0px solid rgba(255, 255, 255, 0);
+        /* Плавный всплывающий музыкальный бар (не сдвигает интерфейс) */
+        .music-bar-overlay {
+            position: absolute;
+            top: 65px;
+            left: 20px;
+            right: 20px;
+            background: rgba(10, 12, 20, 0.95);
+            border: 1px solid rgba(188, 111, 241, 0.4);
             border-radius: 16px;
-            margin-bottom: 0;
-            padding: 0 12px;
-        }
-        .music-bar.open {
-            max-height: 120px;
-            opacity: 1;
             padding: 12px;
-            margin-bottom: 18px;
-            border: 1px solid rgba(188, 111, 241, 0.35);
+            z-index: 25;
+            backdrop-filter: blur(10px);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
         }
+        .music-bar-overlay.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
         .player-row {
             display: flex;
             align-items: center;
@@ -122,18 +127,15 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
-            will-change: transform;
         }
         .track-cover svg {
             width: 20px;
             height: 20px;
             fill: var(--glow-cyan);
         }
-        .music-bar.playing .track-cover {
-            -webkit-animation: spin 6s linear infinite;
+        .music-bar-overlay.playing .track-cover {
             animation: spin 6s linear infinite;
         }
-        @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
         @keyframes spin { 100% { transform: rotate(360deg); } }
         
         .track-info {
@@ -201,12 +203,12 @@
             min-width: 26px;
         }
 
-        /* --- ИСПРАВЛЕННЫЙ КОНТЕЙНЕР АВАРАРКИ ДЛЯ ВСЕХ БРАУЗЕРОВ --- */
+        /* Контейнер Аватарки */
         .avatar-container {
             position: relative;
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 16px;
+            width: 130px;
+            height: 130px;
+            margin: 10px auto 16px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -216,35 +218,30 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 120px;
-            height: 120px;
+            width: 130px;
+            height: 130px;
             pointer-events: none;
             z-index: 1;
         }
 
+        /* Мягкая фиолетовая волна баса */
         .pulse-ring {
             position: absolute;
-            top: 12px;
-            left: 12px;
             width: 96px;
             height: 96px;
             border-radius: 50%;
             border: 2px solid var(--glow-purple);
             opacity: 0;
             pointer-events: none;
-            box-sizing: border-box;
+            z-index: 0;
         }
         .playing .pulse-ring {
-            -webkit-animation: ringPulse 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
-            animation: ringPulse 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+            animation: smoothPulse 2s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
         }
-        @-webkit-keyframes ringPulse {
-            0% { -webkit-transform: scale(0.95); opacity: 0.8; }
-            100% { -webkit-transform: scale(1.45); opacity: 0; }
-        }
-        @keyframes ringPulse {
-            0% { transform: scale(0.95); opacity: 0.8; }
-            100% { transform: scale(1.45); opacity: 0; }
+        @keyframes smoothPulse {
+            0% { transform: scale(1); opacity: 0.6; border-color: var(--glow-purple); }
+            50% { border-color: var(--glow-cyan); }
+            100% { transform: scale(1.4); opacity: 0; }
         }
 
         .avatar-wrapper {
@@ -256,17 +253,11 @@
             padding: 3px;
             background: linear-gradient(135deg, var(--glow-purple), var(--glow-cyan));
             box-shadow: 0 0 15px rgba(188, 111, 241, 0.4);
-            -webkit-animation: floatAvatar 4s ease-in-out infinite;
             animation: floatAvatar 4s ease-in-out infinite;
-            will-change: transform, box-shadow;
-        }
-        @-webkit-keyframes floatAvatar {
-            0%, 100% { -webkit-transform: translateY(0) scale(1); box-shadow: 0 0 15px rgba(188, 111, 241, 0.4); }
-            50% { -webkit-transform: translateY(-4px) scale(1.02); box-shadow: 0 0 25px rgba(0, 240, 255, 0.6); }
         }
         @keyframes floatAvatar {
-            0%, 100% { transform: translateY(0) scale(1); box-shadow: 0 0 15px rgba(188, 111, 241, 0.4); }
-            50% { transform: translateY(-4px) scale(1.02); box-shadow: 0 0 25px rgba(0, 240, 255, 0.6); }
+            0%, 100% { transform: translateY(0); box-shadow: 0 0 15px rgba(188, 111, 241, 0.4); }
+            50% { transform: translateY(-4px); box-shadow: 0 0 25px rgba(0, 240, 255, 0.6); }
         }
 
         .avatar-img {
@@ -408,26 +399,15 @@
 </head>
 <body>
 
-    <!-- Подгрузка трека -->
-    <audio id="bg-audio" loop preload="auto">
-        <source src="grustinka.mp3" type="audio/mpeg">
-        <source src="./grustinka.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="bg-audio" loop preload="auto" src="grustinka.mp3"></audio>
 
     <div class="card" id="card">
         <button class="music-toggle-btn" id="toggle-btn" onclick="togglePlayerPanel(event)" title="Музыка">
             <svg viewBox="0 0 24 24"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
         </button>
 
-        <div class="avatar-container" id="avatar-container">
-            <div class="pulse-ring"></div>
-            <canvas id="visualizer-canvas" width="120" height="120"></canvas>
-            <div class="avatar-wrapper">
-                <img class="avatar-img" src="avatar.png" onerror="this.src='https://picsum.photos/200'" alt="Avatar">
-            </div>
-        </div>
-
-        <div class="music-bar open" id="music-bar">
+        <!-- Всплывающая панель (Не двигает карточку) -->
+        <div class="music-bar-overlay" id="music-bar">
             <div class="player-row">
                 <div class="track-cover">
                     <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 14.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5zm0-5.5c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1z"/></svg>
@@ -446,6 +426,14 @@
                     <div class="progress-fill" id="progress-fill"></div>
                 </div>
                 <span class="time-text" id="time-dur">0:00</span>
+            </div>
+        </div>
+
+        <div class="avatar-container" id="avatar-container">
+            <div class="pulse-ring"></div>
+            <canvas id="visualizer-canvas" width="130" height="130"></canvas>
+            <div class="avatar-wrapper">
+                <img class="avatar-img" src="avatar.png" onerror="this.src='https://picsum.photos/200'" alt="Avatar">
             </div>
         </div>
         
@@ -506,7 +494,6 @@
     <script>
         const audio = document.getElementById('bg-audio');
         const musicBar = document.getElementById('music-bar');
-        const mainPlayBtn = document.getElementById('main-play-btn');
         const playIcon = document.getElementById('play-icon');
         const progressFill = document.getElementById('progress-fill');
         const timeCurr = document.getElementById('time-curr');
@@ -520,13 +507,15 @@
 
         let audioCtx, analyser, dataArray;
         let isAudioSetup = false;
+        let smoothBass = 0; // Для сглаживания ритма
 
         function initAudioContext() {
             if (isAudioSetup) return;
             try {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 analyser = audioCtx.createAnalyser();
-                analyser.fftSize = 64;
+                analyser.fftSize = 128;
+                analyser.smoothingTimeConstant = 0.8; // Плавность анимации
                 const source = audioCtx.createMediaElementSource(audio);
                 source.connect(analyser);
                 analyser.connect(audioCtx.destination);
@@ -534,10 +523,11 @@
                 isAudioSetup = true;
                 drawVisualizer();
             } catch (e) {
-                // Если заблокирован CORS или браузер запрещает доступ
+                console.log(e);
             }
         }
 
+        // Красивый плавающий круг-волна эквалайзера
         function drawVisualizer() {
             requestAnimationFrame(drawVisualizer);
             if (!analyser || audio.paused) {
@@ -549,14 +539,17 @@
 
             analyser.getByteFrequencyData(dataArray);
 
+            // Низкие частоты (бас)
             let bassSum = 0;
-            for (let i = 0; i < 6; i++) {
-                bassSum += dataArray[i];
-            }
-            let bassAvg = bassSum / 6;
+            for (let i = 0; i < 4; i++) bassSum += dataArray[i];
+            let rawBass = bassSum / 4;
 
-            let scaleVal = 1 + (bassAvg / 255) * 0.035;
-            let glowVal = (bassAvg / 255) * 20;
+            // Сглаживание движения (без рывков)
+            smoothBass += (rawBass - smoothBass) * 0.15;
+
+            // Нежная пульсация карточки
+            let scaleVal = 1 + (smoothBass / 255) * 0.025;
+            let glowVal = (smoothBass / 255) * 15;
             document.documentElement.style.setProperty('--beat-scale', scaleVal.toFixed(3));
             document.documentElement.style.setProperty('--beat-glow', glowVal.toFixed(1) + 'px');
 
@@ -564,12 +557,12 @@
 
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
-            const radius = 50;
-            const bars = 28;
+            const radius = 52;
+            const bars = 36;
 
             for (let i = 0; i < bars; i++) {
-                let value = dataArray[i % dataArray.length] || 0;
-                let barHeight = (value / 255) * 12;
+                let value = dataArray[i % 16] || 0;
+                let barHeight = (value / 255) * 10;
 
                 let angle = (i * 360 / bars) * Math.PI / 180;
                 let x1 = centerX + Math.cos(angle) * radius;
@@ -578,7 +571,7 @@
                 let y2 = centerY + Math.sin(angle) * (radius + barHeight);
 
                 ctx.strokeStyle = i % 2 === 0 ? '#bc6ff1' : '#00f0ff';
-                ctx.lineWidth = 2.5;
+                ctx.lineWidth = 2;
                 ctx.lineCap = 'round';
                 ctx.beginPath();
                 ctx.moveTo(x1, y1);
@@ -587,10 +580,22 @@
             }
         }
 
-        /* Переключение видимости музыкальной панели */
         function togglePlayerPanel(e) {
             if(e) e.stopPropagation();
             musicBar.classList.toggle('open');
+        }
+
+        /* Плавное затухание громкости (Fade Out) */
+        function fadeOutAndPause() {
+            let fadeInterval = setInterval(() => {
+                if (audio.volume > 0.05) {
+                    audio.volume -= 0.05;
+                } else {
+                    clearInterval(fadeInterval);
+                    audio.pause();
+                    audio.volume = 1.0;
+                }
+            }, 30);
         }
 
         function manualPlay(e) {
@@ -599,22 +604,23 @@
             if (audioCtx && audioCtx.state === 'suspended') {
                 audioCtx.resume();
             }
+
             if (audio.paused) {
+                audio.volume = 1.0;
                 audio.play().catch(() => {});
             } else {
-                audio.pause();
+                fadeOutAndPause();
             }
         }
 
         document.addEventListener('click', (e) => {
-            // Если кликнули на кнопки — автовопроизведение не перехватывает
-            if (e.target.closest('.music-toggle-btn') || e.target.closest('.play-btn') || e.target.closest('.progress-bar')) return;
-            
+            if (e.target.closest('.music-toggle-btn') || e.target.closest('.music-bar-overlay')) return;
             if (audio.paused) {
                 initAudioContext();
                 if (audioCtx && audioCtx.state === 'suspended') {
                     audioCtx.resume();
                 }
+                audio.volume = 1.0;
                 audio.play().catch(() => {});
             }
         }, { once: true });
